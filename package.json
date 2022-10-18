@@ -1,0 +1,24 @@
+{
+  "name": "AutoToolBox",
+  "icon": "./icon.ico",
+  "version": "1.0.0",
+  "dependencies": {
+    "art-template": "^4.13.2",
+    "regedit": "^5.1.1"
+  },
+  "bin": {
+    "AutoToolBoxRegistry": "./index.js"
+  },
+  "pkg": {
+    "targets": [
+      "node14-win-x64"
+    ],
+    "outputPath": "./"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.0"
+  },
+  "scripts": {
+    "npm build": "pkg package.json"
+  }
+}
