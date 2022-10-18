@@ -14,12 +14,12 @@ JetBrain的ToolBox一直没有自动添加右键菜单的功能，仅根据exe�
 dir
 |
 |---ico
-|	|
-|	|---idea.ico
-|	|
-|	|---goland.ico
-|	|
-|	|---toolbox.ico
+|   |
+|   |---idea.ico
+|   |
+|   |---goland.ico
+|   |
+|   |---toolbox.ico
 |
 |---idea.cmd
 |
