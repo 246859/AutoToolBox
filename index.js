@@ -15,7 +15,7 @@ const DIR_BACKGROUND = "HKEY_CLASSES_ROOT\\Directory\\Background\\shell\\ToolBox
 //icon文件夹
 const ICON_DIR = "ico";
 
-const TOOL_BOX_ICO = "icon.ico";
+const TOOL_BOX_ICO = "toolbox.ico";
 
 
 rd.question("input your absolute scripts path:", answer => {
@@ -54,8 +54,8 @@ rd.question("input your absolute scripts path:", answer => {
             subCommands,
             subCommandList
         };
-        let addTemp = template.render(fs.readFileSync("./templates/addTemplate.art", "utf-8"), content);
-        let deleteTemp = template.render(fs.readFileSync("./templates/deleteTemplate.art", "utf-8"), content);
+        let addTemp = template.render(fs.readFileSync(path.join(__dirname,"public/templates/addTemplate.art"), "utf-8"), content);
+        let deleteTemp = template.render(fs.readFileSync(path.join(__dirname,"public/templates/deleteTemplate.art"), "utf-8"), content);
         let addPath = `${scriptsDir}/toolboxAdd.reg`;
         let deletePath = `${scriptsDir}/toolboxDelete.reg`;
         fs.writeFileSync(addPath,
