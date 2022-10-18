@@ -4,13 +4,13 @@ Windows Registry Editor Version 5.00
 "SubCommands"="{{@subCommands}}"
 "Icon"="{{@superCommand.icon}}"
 "Position"="Top"
-"MUIVerb"="ToolBoxTest"
+"MUIVerb"="Open As ToolBox"
 
 [-HKEY_CLASSES_ROOT\Directory\Background\shell\ToolBoxBackground]
 "SubCommands"="{{@subCommands}}"
 "Icon"="{{@superCommand.icon}}"
 "Position"="Top"
-"MUIVerb"="ToolBoxTest"
+"MUIVerb"="Open ToolBox Here"
 
 {{each subCommandList}}
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\{{@$value.regKey}}]
