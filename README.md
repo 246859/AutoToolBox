@@ -1,5 +1,32 @@
 # AutoToolBox
 
+
+JetBrain's ToolBox has not automatically added the function of right-click menu, only according to exe to modify the registry is very cumbersome and not available after the version update.
+
+The resulting registry script from this script is a shell script that will still be available after an updated version and can facilitate quick modification/deletion of the registry.
+
+This script is developed on Windows 10 systems, the default generated registry version is '5.00', some details need to be modified by yourself.
+
+Make sure your input directory should conform to the structure below before using it
+
+```
+dir
+|
+|---ico
+|   |
+|   |---idea.ico
+|   |
+|   |---goland.ico
+|   |
+|   |---toolbox.ico
+|
+|---idea.cmd
+|
+|---goland.cmd
+```
+
+As a reminder, the exe copy-paste path is the right mouse button.
+
 JetBrain的ToolBox一直没有自动添加右键菜单的功能，仅根据exe修改注册表十分的繁琐而且版本更新后就不可用了，
 
 此脚本的生成的注册表脚本是基于shell脚本，版本更新后依然可用，并且可以方便快速修改/删除注册表。
@@ -27,3 +54,5 @@ dir
 ```
 
 提醒一下exe复制粘贴路径是鼠标右键。
+
+
