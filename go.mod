@@ -1,4 +1,4 @@
-module autotoolbox
+module github.com/246859/AutoToolBox/v2
 
 go 1.19
 
