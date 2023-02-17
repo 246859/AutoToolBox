@@ -1,6 +1,6 @@
 # AutoToolBox
 
-一个可以自动生成ToolBox注册表脚本的简单工具，仅限Windows系统。
+一个可以自动生成ToolBox注册表脚本的简单工具，仅限Windows系统，[youtrack问题链接](https://youtrack.jetbrains.com/issue/TBX-2540/Associate-file-extenstions-with-correct-Toolbox-app-or-with-the-Toolbox-itself-so-that-files-can-be-launched-from-Windows)
 
 [简体中文](#简体中文)|[English](#English)
 
