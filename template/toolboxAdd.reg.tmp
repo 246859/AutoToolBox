@@ -1,0 +1,22 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\shell\ToolBoxProject]
+"SubCommands"="{{.SubCommands}}"
+"Icon"="{{.Icon}}"
+"Position"="Top"
+"MUIVerb"="Open As ToolBox"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\ToolBoxBackground]
+"SubCommands"="{{.SubCommands}}"
+"Icon"="{{.Icon}}"
+"Position"="Top"
+"MUIVerb"="Open ToolBox Here"
+
+{{range $name,$ide := .IdeGroup}}
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\{{$ide.HKey}}]
+@="Open {{$ide.Display}} Here"
+"Icon"="{{$ide.IconPath}}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\{{$ide.HKey}}\command]
+@="\"{{$ide.ShellPath}}\" \"%v\""
+{{end}}

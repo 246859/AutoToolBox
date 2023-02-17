@@ -1,0 +1,1 @@
+go build -o D:\WorkSpace\Code\GitHubProject\AutoToolBox\build\go_build_autotoolbox.exe autotoolbox
