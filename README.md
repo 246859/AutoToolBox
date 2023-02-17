@@ -1,6 +1,6 @@
 # AutoToolBox
 
-一个自动生成ToolBox注册表脚本的工具，仅限Windows系统。
+一个可以自动生成ToolBox注册表脚本的简单工具，仅限Windows系统。
 
 [简体中文](#简体中文)|[English](#English)
 
@@ -57,7 +57,11 @@ dir
 
 ![image-20230217211635959](assets/README/image-20230217211635959.png)
 
-在Windows系统下`reg`脚本可以直接点击执行
+在Windows系统下`reg`脚本可以直接点击执行，当你看到如下输出时，说明执行成功。
+
+```
+[TIP]   reg files has been successfully generated in the directory C:\Users\Stranger\AppData\Local\JetBrains\Toolbox\scripts\AutoToolBox
+```
 
 ### 效果
 
@@ -118,7 +122,11 @@ Finally, `C:\Users\Stranger\AppData\Local\JetBrains\Toolbox\scripts\AutoToolBox`
 
 ![image-20230217211635959](assets/README/image-20230217211635959.png)
 
-The `reg` script can be executed directly by clicking on the Windows system without any tools.
+In the Windows system, the `reg` script can be executed by clicking directly. When you see the following output, it means that the execution is successful.
+
+```
+[TIP]   reg files has been successfully generated in the directory C:\Users\Stranger\AppData\Local\JetBrains\Toolbox\scripts\AutoToolBox
+```
 
 ### Effect
 
