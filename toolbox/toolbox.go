@@ -105,6 +105,7 @@ func parseShell(input string, flag string) (JetBrainItemGroup, error) {
 	}
 	// 初始化map
 	jetBrainMap := make(map[string]JetBrainItem, 20)
+	var names []string
 	// 扫描脚本
 	for _, entry := range dir {
 		// 如果是cmd脚本的话
@@ -121,9 +122,10 @@ func parseShell(input string, flag string) (JetBrainItemGroup, error) {
 				ShellPath: shellPath,
 				HKey:      hKey,
 			}
-			fmt.Printf("%s script found\n", name)
+			names = append(names, name)
 		}
 	}
+	fmt.Printf("found %s\n", strings.Join(names, ","))
 	return jetBrainMap, nil
 }
 
@@ -202,5 +204,6 @@ func parseTemplate(target string, toolbox JetBrainToolBox) error {
 	if err := removeTem.Execute(removeRegFile, toolbox); err != nil {
 		return err
 	}
+	fmt.Println("generated")
 	return nil
 }
