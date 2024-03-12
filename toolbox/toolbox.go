@@ -125,7 +125,7 @@ func parseShell(input string, flag string) (JetBrainItemGroup, error) {
 			names = append(names, name)
 		}
 	}
-	fmt.Printf("found %s\n", strings.Join(names, ","))
+	fmt.Printf("found ides: %s\n", strings.Join(names, ","))
 	return jetBrainMap, nil
 }
 
@@ -204,6 +204,6 @@ func parseTemplate(target string, toolbox JetBrainToolBox) error {
 	if err := removeTem.Execute(removeRegFile, toolbox); err != nil {
 		return err
 	}
-	fmt.Println("generated")
+	fmt.Println("generated successfully")
 	return nil
 }
