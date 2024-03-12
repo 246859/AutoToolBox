@@ -2,5 +2,5 @@ package assets
 
 import "embed"
 
-//go:embed ico
+//go:embed *
 var Fs embed.FS
