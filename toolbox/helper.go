@@ -1,23 +1,11 @@
-package main
+package toolbox
 
 import (
-	"fmt"
-	"github.com/fatih/color"
 	"os"
 	"strings"
 )
 
-const (
-	ColorRed   = "\x1b[31m"
-	ColorGreen = "\x1b[32m"
-	ColorClean = "\x1b[0m"
-)
-
-// ToFirstLetterUpper
-// @Date 2023-02-17 17:54:43
-// @Param str string
-// @Return string
-// @Description: 第一个字母大写
+// ToFirstLetterUpper 第一个字母大写
 func ToFirstLetterUpper(str string) string {
 	if len(str) == 0 {
 		return str
@@ -74,16 +62,4 @@ func openFile(path string) (*os.File, error) {
 // @Description: regx脚本转义
 func EscapeRegxPath(path string) string {
 	return strings.ReplaceAll(path, `\`, `\\`)
-}
-
-func Info(args ...any) {
-	color.Green("[INFO]\t%-100s", fmt.Sprint(args...))
-}
-
-func Error(args ...any) {
-	color.Red("[ERROR]\t%-100s", fmt.Sprint(args...))
-}
-
-func Success(args ...any) {
-	color.Cyan("[TIP]\t%-100s", fmt.Sprint(args...))
 }
