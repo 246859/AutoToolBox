@@ -1,1 +1,0 @@
-start ./build/go_build_autotoolbox.exe
