@@ -1,5 +1,5 @@
 app_name := toolbox
-app_package := github.com/246859/AutoToolBox/v2
+app_package := github.com/246859/AutoToolBox/v2/cmd/toolbox
 hostos := $(shell go env GOHOSTOS)
 hostarch := $(shell go env GOHOSTARCH)
 os =
