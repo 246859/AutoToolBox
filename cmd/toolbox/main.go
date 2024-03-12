@@ -9,8 +9,9 @@ import (
 
 var in string
 var rootCmd = &cobra.Command{
-	Use:   "toolbox [command]",
-	Short: "toolbox is a command line tool to generate win regex scripts for jetbrain ide",
+	Use:           "toolbox [command]",
+	Short:         "toolbox is a command line tool to generate win regex scripts for jetbrain ide",
+	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// 生成reg脚本
 		if err := toolbox.Generate(in); err != nil {
