@@ -29,9 +29,10 @@ Usage:
 
 Flags:
   -h, --help           help for toolbox
-  -i, --input string   input directory (default "C:\\Users\\Stranger\\AppData\\Local\\JetBrains\\Toolbox\\scripts")
+  -i, --input string   input directory (default "C:\\Users\\stranger\\AppData\\Local\\JetBrains\\Toolbox\\scripts")
+      --top            whether to set top position
 ```
-工具使用方法十分的简单，只有一个参数`-i`，即shell脚本文件夹，如果不携带任何参数执行，工具会尝试在当前用户目录下去查找，也就是`default`的值。
+工具使用方法十分的简单，只有两个参数，`-i`指定了shell脚本文件夹，如果不携带任何参数执行，工具会尝试在当前用户目录下去查找，也就是`default`的值。`--top`表示右键菜单是否置顶。
 ```bash
 $ ./toolbox-windows-amd64.exe -i C:\\Users\\Stranger\\AppData\\Local\\JetBrains\\Toolbox\\scripts
 ```
