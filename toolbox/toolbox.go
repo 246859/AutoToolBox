@@ -82,6 +82,8 @@ func Generate(output string, top bool) error {
 	toolBox.SubCommands = parseSubCommands(toolBox.IdeGroup)
 	// 生成图标文件
 	iconDir := path.Join(output, "ico")
+	// 删除图标文件夹
+	_ = os.RemoveAll(iconDir)
 	if err := filebox.CopyFs(assets.Fs, "ico", output); err != nil {
 		return err
 	}
@@ -181,7 +183,7 @@ func parseTemplate(target string, toolbox JetBrainToolBox) error {
 
 	// 创建目录
 	dir := filepath.Join(target, OutPutDir)
-	if err := Mkdir(dir); err != nil {
+	if err := os.MkdirAll(dir, 0666); err != nil {
 		return err
 	}
 
