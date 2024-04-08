@@ -56,6 +56,7 @@ type JetBrainToolBox struct {
 	FLag        string
 	Icon        string
 	SubCommands string
+	Top         bool
 	IdeGroup    JetBrainItemGroup
 }
 
@@ -66,8 +67,9 @@ func NewToolBox() JetBrainToolBox {
 }
 
 // Generate 生成reg注册表脚本
-func Generate(output string) error {
+func Generate(output string, top bool) error {
 	toolBox := NewToolBox()
+	toolBox.Top = top
 	// 解析脚本
 	group, err := parseShell(output, toolBox.FLag)
 	if err != nil {
@@ -80,6 +82,8 @@ func Generate(output string) error {
 	toolBox.SubCommands = parseSubCommands(toolBox.IdeGroup)
 	// 生成图标文件
 	iconDir := path.Join(output, "ico")
+	// 删除图标文件夹
+	_ = os.RemoveAll(iconDir)
 	if err := filebox.CopyFs(assets.Fs, "ico", output); err != nil {
 		return err
 	}
@@ -179,7 +183,7 @@ func parseTemplate(target string, toolbox JetBrainToolBox) error {
 
 	// 创建目录
 	dir := filepath.Join(target, OutPutDir)
-	if err := Mkdir(dir); err != nil {
+	if err := os.MkdirAll(dir, 0666); err != nil {
 		return err
 	}
 
