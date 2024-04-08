@@ -56,6 +56,7 @@ type JetBrainToolBox struct {
 	FLag        string
 	Icon        string
 	SubCommands string
+	Top         bool
 	IdeGroup    JetBrainItemGroup
 }
 
@@ -66,8 +67,9 @@ func NewToolBox() JetBrainToolBox {
 }
 
 // Generate 生成reg注册表脚本
-func Generate(output string) error {
+func Generate(output string, top bool) error {
 	toolBox := NewToolBox()
+	toolBox.Top = top
 	// 解析脚本
 	group, err := parseShell(output, toolBox.FLag)
 	if err != nil {
