@@ -3,7 +3,7 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\shell\ToolBoxProject]
 "SubCommands"="{{.SubCommands}}"
 "Icon"="{{.Icon}}"
-{{ if .top }}
+{{ if .Top }}
 "Position"="Top"
 {{ end }}
 "MUIVerb"="Open As ToolBox"
@@ -11,7 +11,7 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\Background\shell\ToolBoxBackground]
 "SubCommands"="{{.SubCommands}}"
 "Icon"="{{.Icon}}"
-{{ if .top }}
+{{ if .Top }}
 "Position"="Top"
 {{ end }}
 "MUIVerb"="Open ToolBox Here"
