@@ -32,7 +32,7 @@ func init() {
 	}
 	userHomeDir := fmt.Sprintf(`%s\AppData\Local\JetBrains\Toolbox\scripts`, current.HomeDir)
 	rootCmd.Flags().StringVarP(&in, "input", "i", userHomeDir, "input directory")
-	rootCmd.Flags().BoolVar(&top, "top", true, "whether to set top position")
+	rootCmd.Flags().BoolVar(&top, "top", false, "whether to set top position")
 }
 
 func main() {
