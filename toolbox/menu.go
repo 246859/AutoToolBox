@@ -1,6 +1,7 @@
 package toolbox
 
 import (
+	"cmp"
 	"encoding/json"
 	"github.com/spf13/cobra"
 	"os"
@@ -51,12 +52,13 @@ type ToolBox struct {
 
 // Tool represents an IDE in ToolBox.
 type Tool struct {
-	Id       string `json:"toolId"`
-	Tag      string `json:"tag"`
-	Name     string `json:"displayName"`
-	Version  string `json:"displayVersion"`
-	Location string `json:"installLocation"`
-	Command  string `json:"launchCommand"`
+	Id          string `json:"toolId"`
+	Tag         string `json:"tag"`
+	Name        string `json:"displayName"`
+	Version     string `json:"displayVersion"`
+	BuildNumber string `json:"buildNumber"`
+	Location    string `json:"installLocation"`
+	Command     string `json:"launchCommand"`
 }
 
 // GetToolBoxState returns content of ToolBox/state.json
@@ -71,10 +73,21 @@ func GetToolBoxState(dir string) (*ToolBox, error) {
 		return nil, err
 	}
 	slices.SortFunc(toolbox.Tools, func(a, b Tool) int {
-		if a.Name != b.Name {
+		// safe check
+		if a.Name == "" || b.Name == "" {
 			return strings.Compare(a.Tag, b.Tag)
 		}
-		return strings.Compare(a.Version, b.Version)
+
+		nameA, nameB := strings.ToLower(a.Name), strings.ToLower(b.Name)
+
+		if nameA[0] != nameB[0] {
+			return cmp.Compare(nameA[0], nameB[0])
+		} else if nameA[0] == nameB[0] {
+			return strings.Compare(nameA, nameB)
+		} else if nameA == nameB {
+			return strings.Compare(a.BuildNumber, b.BuildNumber)
+		}
+		return strings.Compare(nameA, nameB)
 	})
 	return &toolbox, err
 }
