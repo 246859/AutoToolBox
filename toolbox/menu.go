@@ -34,7 +34,7 @@ have modified this location, in most cases you do not need to specify the path.`
 		return nil, err
 	}
 	tbmCmd.SetVersionTemplate("{{ .Version }}")
-	tbmCmd.Flags().StringVarP(&_ToolBoxDir, "dir", "d", defaultTbDIr, "specify the directory where ToolBox installed")
+	tbmCmd.PersistentFlags().StringVarP(&_ToolBoxDir, "dir", "d", defaultTbDIr, "specify the directory where ToolBox installed")
 	tbmCmd.AddCommand(versionCmd)
 	tbmCmd.AddCommand(listCmd)
 	tbmCmd.AddCommand(addMenuCmd)
