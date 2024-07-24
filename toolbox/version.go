@@ -7,7 +7,7 @@ import (
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print toolbox version",
+	Short: "Print ToolBox version",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		version, err := GetToolBoxVersion(_ToolBoxDir)
 		if err != nil {
