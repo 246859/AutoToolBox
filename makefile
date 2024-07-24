@@ -1,33 +1,35 @@
-app_name := toolbox
-app_package := github.com/246859/AutoToolBox/v2/cmd/toolbox
-hostos := $(shell go env GOHOSTOS)
-hostarch := $(shell go env GOHOSTARCH)
-os =
-arch =
-exe =
+# basic info
+app := tbm
+module := github.com/246859/AutoToolBox/v3/cmd/toolboxmenu
+output := $(shell pwd)/build
+# meta info
+git_version := $(shell git tag --sort=-version:refname | sed -n 1p)
+# build info
+host_os := $(shell go env GOHOSTOS)
+host_arch := $(shell go env GOHOSTARCH)
+os := $(host_os)
+arch := $(host_arch)
 
-ifeq ($(os),)
-	os := $(shell go env GOOS)
-endif
-ifeq ($(arch),)
-	arch := $(shell go env GOARCH)
-endif
-ifeq ($(os),windows)
-	exe = .exe
+ifeq ($(os), windows)
+	exe := .exe
 endif
 
-bin := $(app_name)-$(os)-$(arch)$(exe)
 
 .PHONY: build
 build:
-	# set target environment
+	# go lint
+	go vet ./...
+
+	# prepare target environment $(os)/$(arch)
 	go env -w GOOS=$(os)
 	go env -w GOARCH=$(arch)
 
-	# build binary file
-	go vet ./...
-	go build -trimpath -o ./build/$(bin) $(app_package)
+	# build go module
+	go build -trimpath \
+		-ldflags="-X main.AppName=$(app) -X main.Version=$(git_version)" \
+		-o $(output)/$(app)-$(os)-$(arch)$(exe) \
+		$(module)
 
-	# resume host environment
-	go env -w GOOS=$(hostos)
-	go env -w GOARCH=$(hostarch)
+	# resume host environment $(host_os)/$(host_arch)
+	go env -w GOOS=$(host_os)
+	go env -w GOARCH=$(host_arch)
