@@ -1,6 +1,6 @@
-module github.com/246859/AutoToolBox/v2
+module github.com/246859/AutoToolBox/v3
 
-go 1.19
+go 1.22
 
 require (
 	github.com/dstgo/filebox v1.1.0 // indirect
