@@ -2,26 +2,25 @@ package toolbox
 
 import (
 	"os"
-	"strings"
+	"path/filepath"
+	"unsafe"
 )
 
-// openFile 打开一个文件
-func openFile(path string) (*os.File, error) {
-	// 先尝试打开一个文件
-	if open, err := os.OpenFile(path, os.O_RDWR, os.ModePerm); os.IsNotExist(err) {
-		if file, err := os.Create(path); err != nil {
-			return nil, err
-		} else {
-			return file, err
-		}
-	} else if err != nil {
-		return nil, err
-	} else {
-		return open, nil
-	}
+// convert a byte slice to a string without allocating new memory.
+func bytes2string(bytes []byte) string {
+	return unsafe.String(unsafe.SliceData(bytes), len(bytes))
 }
 
-// EscapeRegxPath regx脚本转义
-func EscapeRegxPath(path string) string {
-	return strings.ReplaceAll(path, `\`, `\\`)
+// convert a string to a byte slice without allocating new memory.
+func string2bytes(s string) []byte {
+	return unsafe.Slice(unsafe.StringData(s), len(s))
+}
+
+// returns default toolbox installation directory.
+func getDefaultTbDIr() (string, error) {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, _ToolBoxPath), nil
 }
