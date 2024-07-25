@@ -10,20 +10,21 @@ Original issue link: [TBX-2540 (jetbrains.com)](https://youtrack.jetbrains.com/i
 
 ## Introduction
 
-This is a very simple command line tool used to add a windows right-click menu to the Toolbox App. It has the following features
+This is a very simple command line tool for adding a windows right-click menu to the Toolbox App. It has the following features:
 
-- Updating or rolling back the version will not be invalid (when there are multiple versions of the IDE at the same time, only the latest version will be directed)
+- Updating or rolling back the version will not cause the menu to become invalid (when there are multiple versions of the IDE at the same time, only the latest version will be directed)
 
-- You can set it to open the IDE with administrator privileges
-- No need to manually maintain the registry
+- You can set the IDE to be opened with administrator privileges
+- No need to manually maintain the registry,
+- The display order of the menu is synchronized with that in the Toolbox
 
-The following is the effect picture
+Here is the effect diagram
 
-<img alt="Effect picture" src="https://public-1308755698.cos.ap-chongqing.myqcloud.com//upload/202407251742834.png" width="400" height="300">
+<img alt="Effect diagram" src="image/preview.png" width="400" height="300">
 
 ## Installation
 
-If you have a go environment and the version is greater than go1.16, you can use the `go install`  command to install it, as shown below
+If you have a go environment and the version is greater than go1.16, you can use the `go install` method to install it, as shown below
 
 ```bash
 $ go install github.com/246859/AutoToolBox/v3/cmd/tbm@latest
@@ -33,17 +34,17 @@ Or download the latest binary file directly in Release.
 
 ## Use
 
-The 3.0 version of the tool is much simpler to use. Although there are a few more commands, they are not used in most cases. The only path parameter required is the installation path of the Toolbox. Generally, the Toolbox is installed by default in the following path.
+Version 3.0 is much easier to use. Although there are a few more commands, they are not used in most cases. The only required path parameter is the installation path of the Toolbox. Generally, the Toolbox is installed in the following path by default.
 
 ```
 $HOME/AppData/Local/Jetbrains/Toolbox/
 ```
 
-The tool uses the above path by default, and no additional parameters are required. If the installation path is modified, it needs to be specified with `-d` (it is best not to modify the installation path of the Toolbox).
+The tool uses the above path by default and does not require additional parameters. If the installation path is modified, you need to use `-d` to specify it (it is best not to modify the installation path of the Toolbox).
 
 Please make sure that **Generate Shell Script** in the settings is turned on, otherwise the tool will not work properly.
 
-<img alt="shellpath" src="https://public-1308755698.cos.ap-chongqing.myqcloud.com//upload/202407251742830.png" width=500 height=200/>
+<img alt="shellpath" src="image/shellpath.png" width=500 height=200/>
 
 ### Start
 
@@ -59,11 +60,11 @@ You can add all locally installed IDEs to the right-click menu. This is the simp
 
 ```
 Available Commands:
-  add         Add ToolBox IDE to existing context menu
-  list        List installed ToolBox IDEs
-  remove      Remove ToolBox IDEs from context menu
-  set         Register ToolBox IDEs to context menu
-  version     Print ToolBox version
+add Add ToolBox IDE to existing context menu
+list List installed ToolBox IDEs
+remove Remove ToolBox IDEs from context menu
+set Register ToolBox IDEs to context menu
+version Print ToolBox version
 ```
 
 The following is a brief description of the general function of each command
@@ -72,6 +73,11 @@ The following is a brief description of the general function of each command
 
 ```bash
 $ tbm list -h
+Examples:
+  tbm list -c
+  tbm list --menu
+  tbm list -c --menu
+
 Usage:
   tbm list [flags]
 
@@ -131,6 +137,8 @@ $ tbm list --menu -c
 16
 ```
 
+
+
 #### set
 
 ```bash
@@ -147,9 +155,9 @@ Flags:
   -u, --update    only select current menu items
 ```
 
-The `set` command is used to register the locally installed IDE to the right-click menu. It works by overwriting. Each execution will overwrite the previous menu. If you want to add them one by one, you can consider using the `add` command.
+The `set` command indicates which IDEs are set as menu items. It will directly overwrite the existing menus. The display order of the menus is the same as in the Toolbox interface.
 
-The simplest use is to add all directly. If the number of local IDEs exceeds 16, only the first 16 will be added. This is because the maximum number of Windows menu items is 16.
+The simplest way to use it is to directly set all IDEs as menu items. If the number of local IDEs exceeds 16, only the first 16 will be added. This is because the maximum limit of Windows menu items is 16.
 
 ```bash
 $ tbm set -a
@@ -190,11 +198,39 @@ Using `--update` will only update existing menu items, not add new ones. If ther
 $ tbm set --update
 ```
 
-When registering a menu, you can use `--top` to make the Toolbox menu at the top position
+When registering the menu, you can use `--top` to make the Toolbox menu at the top position
 
 ```bash
 $ tbm set -a --admin --top
 ```
+
+<br/>
+
+It should be noted that some products do not provide a stable shell script path or the location of the `exe` file. The following are some of them
+
+```
+dotMemory Portable
+dotPeek Portable
+dotTrace Portable
+ReSharper Tools
+```
+
+Although they can be added to the menu at this stage, their file structure is not as organized as other IDEs. The `list` command will show which tools are not supported yet, as follows
+
+```bash
+$ tbm list
+Android Studio                  Koala 2024.1.1 Patch 1
+Aqua                            2024.1.2
+CLion                           2024.1.4
+DataGrip                        2024.1.4
+DataSpell                       2024.1.3
+dotMemory Portable              2024.1.4                unavailable
+dotPeek Portable                2024.1.4                unavailable
+dotTrace Portable               2024.1.4                unavailable
+Fleet                           1.37.84 Public Preview
+```
+
+For them, they will not be added to the menu for the time being.
 
 #### add
 
@@ -210,13 +246,13 @@ Flags:
       --top       place toolbox menu at top of context menu
 ```
 
-The difference between the `add` command is that it will add new menu items to the existing menu, instead of directly overwriting like `set`, and the usage is generally the same.
+The difference between the `add` command is that it will add new menu items to the existing menu instead of directly overwriting like `set`, and the usage is generally the same.
 
 ```bash
 $ tbm add GoLand WebStorm
 ```
 
-However, it does not support `-a`, and cannot add all IDEs at once.
+However, it does not support `-a`, so all IDEs cannot be added at once.
 
 #### rmove
 
@@ -247,6 +283,25 @@ Use `-a` to remove all
 ```bash
 $ tbm rm -a
 ```
+
+
+
+#### clear
+
+```bash
+$ tbm clear
+clear all the context menu of Toolbox
+
+Usage:
+tbm clear [flags]
+
+Flags:
+-h, --help help for clear
+```
+
+The command `clear` will directly clear all menu items related to Toolbox, including the top-level menu, and will not produce any output. If you do not want to use this tool anymore, you can use this command to clear all registry entries.
+
+
 
 ## Contribution
 

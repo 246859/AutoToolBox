@@ -12,11 +12,12 @@
 
 ## 简介
 
-这是一个很简单的命令行工具，用于给Toolbox App添加windows右键菜单，它有以下特性
+这是一个很简单的命令行工具，用于给Toolbox App添加windows右键菜单，它具有以下特性：
 
-- 更新或回退版本不会失效（同时存在多个版本的IDE时，只会导向最新版）
+- 更新或回退版本不会导致菜单失效（同时存在多个版本的IDE时，只会导向最新版）
 - 可设置通过管理员权限打开IDE
-- 无需手动维护注册表
+- 无需手动维护注册表，
+- 菜单的展示顺序与Toolbox中的同步
 
 下面是效果图
 
@@ -79,6 +80,11 @@ Available Commands:
 
 ```bash
 $ tbm list -h
+Examples:
+  tbm list -c
+  tbm list --menu
+  tbm list -c --menu
+
 Usage:
   tbm list [flags]
 
@@ -156,9 +162,9 @@ Flags:
   -u, --update    only select current menu items
 ```
 
-`set`命令用于将本地安装的IDE注册到右键菜单中，它的工作方式是覆盖，每一次执行都会将先前的菜单覆盖掉，如果你想逐个添加可以考虑使用`add`命令。
+`set`命令表示将哪些IDE设置为菜单项，会直接覆盖现有的菜单，菜单的展示顺序与Toolbox界面中的相同。
 
-最简单的使用就是直接全部添加，全部添加时如果本地的IDE数量超过了16个，那么只会添加前16个，这是因为windows菜单项的最大数量就是16个。
+最简单的使用方法就是直接将全部IDE设置为菜单项，如果本地的IDE数量超过了16个，那么只会添加前16个，这是因为windows菜单项的最大限制就是16个。
 
 ```bash
 $ tbm set -a
@@ -204,6 +210,34 @@ $ tbm set --update
 ```bash
 $ tbm set -a --admin --top
 ```
+
+<br/>
+
+需要注意的是，有一些产品既没有提供稳定的shell脚本路径，也没有提供`exe`文件的位置，下面几个就是
+
+```
+dotMemory Portable              
+dotPeek Portable               
+dotTrace Portable
+ReSharper Tools
+```
+
+虽然现阶段可以将其添加到菜单中，但它们的文件结构并不像其他IDE一样具有条理，`list`命令会展示出现哪些工具暂不支持，如下
+
+```bash
+$ tbm list
+Android Studio                  Koala 2024.1.1 Patch 1
+Aqua                            2024.1.2
+CLion                           2024.1.4
+DataGrip                        2024.1.4
+DataSpell                       2024.1.3
+dotMemory Portable              2024.1.4                unavailable
+dotPeek Portable                2024.1.4                unavailable
+dotTrace Portable               2024.1.4                unavailable
+Fleet                           1.37.84 Public Preview
+```
+
+对于它们而言，暂时不会被添加进菜单中。
 
 
 
@@ -262,6 +296,21 @@ $ tbm rm -a
 ```
 
 
+
+#### clear
+
+```bash
+$ tbm clear
+clear all the context menu of Toolbox
+
+Usage:
+  tbm clear [flags]
+
+Flags:
+  -h, --help   help for clear
+```
+
+命令`clear`会直接清空所有与Toolbox有关的菜单项，包括顶级菜单，且不会有任何输出。如果你不想再使用本工具，可以用该命令将所有注册表项清理干净。
 
 
 
