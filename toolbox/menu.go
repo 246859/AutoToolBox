@@ -71,6 +71,7 @@ see more information at https://github.com/246859/AutoToolBox
 	tbmCmd.AddCommand(setCmd)
 	tbmCmd.AddCommand(addCmd)
 	tbmCmd.AddCommand(removeCmd)
+	tbmCmd.AddCommand(clearCmd)
 
 	return tbmCmd, nil
 }
