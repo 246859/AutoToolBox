@@ -3,7 +3,6 @@ package toolbox
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"path/filepath"
 	"slices"
 )
 
@@ -71,11 +70,7 @@ func AddToolboxMenu(dir string, targets []string, admin, top bool) ([]*Tool, err
 
 	// create new subcommands
 	for _, tool := range appendTools {
-		ico := filepath.Join(tool.Location, tool.Command)
-		if tool.Id == "MPS" {
-			ico = filepath.Join(tool.Location, "bin/mps.ico")
-		}
-		err := setItem(tool.Id, tool.Name, ico, tool.Script, admin)
+		err := setItem(tool, all)
 		if err != nil {
 			return nil, err
 		}

@@ -85,11 +85,6 @@ func SetToolBoxMenu(dir string, targets []string, top, admin, all, update bool) 
 	// collect tools
 	tools := FindTargetTools(toolbox.Tools, targets, all || update)
 
-	// check exclude tools
-	if err := checkExclude(tools); err != nil {
-		return nil, err
-	}
-
 	// select items from menu
 	itemsInMenu, _, err := ReadSubCommands()
 	if err != nil {
@@ -113,11 +108,7 @@ func SetToolBoxMenu(dir string, targets []string, top, admin, all, update bool) 
 	var items []string
 	// add menu item
 	for _, tool := range tools {
-		ico := filepath.Join(tool.Location, tool.Command)
-		if tool.Id == "MPS" {
-			ico = filepath.Join(tool.Location, "bin/mps.ico")
-		}
-		err := setItem(tool.Id, tool.Name, ico, tool.Script, admin)
+		err := setItem(tool, admin)
 		if err != nil {
 			return nil, err
 		}
@@ -185,32 +176,43 @@ func setMenuItem(path, display, command, subCommands string, top bool) error {
 }
 
 // setItem add items to commandStore shell
-func setItem(name, display, icon, command string, admin bool) error {
-	regPath := _CommandStoreShell + name
+func setItem(tool *Tool, admin bool) error {
+
+	regPath := _CommandStoreShell + tool.Id
+	ico := filepath.Join(tool.Location, tool.Command)
+	script := tool.Script
+	// special case for MPS
+	if tool.Id == "MPS" {
+		ico = filepath.Join(tool.Location, "bin/mps.ico")
+	}
+	if tool.availability == legacy {
+		script = ico
+	} else if tool.availability == unavailable {
+		return nil
+	}
 	// create or open registry key
 	key, err := createAndOpen(registry.LOCAL_MACHINE, regPath, registry.WRITE)
 	if err != nil {
 		return err
 	}
 
-	displayName := fmt.Sprintf("Open %s Here", display)
 	// default value
-	if err := key.SetStringValue("", displayName); err != nil {
+	if err := key.SetStringValue("", fmt.Sprintf("Open %s Here", tool.Name)); err != nil {
 		return err
 	}
 	// set icon
-	if err := key.SetStringValue("Icon", icon); err != nil {
+	if err := key.SetStringValue("Icon", ico); err != nil {
 		return err
 	}
 
-	cmdPath := regPath + `\command`
-	cmdKey, err := createAndOpen(registry.LOCAL_MACHINE, cmdPath, registry.WRITE)
+	// command sub key
+	cmdKey, err := createAndOpen(registry.LOCAL_MACHINE, regPath+`\command`, registry.WRITE)
 	if err != nil {
 		return err
 	}
 
 	// set command
-	if err := cmdKey.SetStringValue("", commandScript(command, admin)); err != nil {
+	if err := cmdKey.SetStringValue("", commandScript(script, admin)); err != nil {
 		return err
 	}
 

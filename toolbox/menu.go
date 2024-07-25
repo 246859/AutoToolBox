@@ -83,6 +83,37 @@ type ToolBox struct {
 	ShellPath string
 }
 
+type Availability int
+
+const (
+	available Availability = iota
+	legacy
+	unavailable
+)
+
+func (a Availability) String() string {
+	switch a {
+	case available:
+		return "available"
+	case legacy:
+		return "legacy"
+	case unavailable:
+		return "unavailable"
+	default:
+		return "available"
+	}
+}
+
+func toolFilter(tools []*Tool, maxAvl Availability) []*Tool {
+	var filtered []*Tool
+	for _, tool := range tools {
+		if tool.availability <= maxAvl {
+			filtered = append(filtered, tool)
+		}
+	}
+	return filtered
+}
+
 // Tool represents an IDE in ToolBox.
 type Tool struct {
 	Id          string `json:"toolId"`
@@ -97,8 +128,8 @@ type Tool struct {
 	// script file
 	Script string
 
-	order       int
-	unSupported bool
+	order        int
+	availability Availability
 }
 
 // GetToolBoxState returns content of ToolBox/state.json
@@ -147,8 +178,11 @@ func GetToolBoxState(dir string) (*ToolBox, error) {
 			}
 		}
 
-		if tool.Script == "" {
-			tool.unSupported = true
+		// judge availability
+		if tool.Script == "" && tool.Command == "" {
+			tool.availability = unavailable
+		} else if tool.Script == "" {
+			tool.availability = legacy
 		}
 
 		// by default, the ordering of tools is depending on state.json that is maintained by Toolbox.
@@ -223,30 +257,22 @@ func FindLatestTool(tools []*Tool) *Tool {
 	return maxTool
 }
 
+// FindTargetTools returns tools with specific names
 func FindTargetTools(tools []*Tool, targets []string, all bool) []*Tool {
 	var targetTools []*Tool
 	if all {
-		targetTools = slices.DeleteFunc(tools, func(tool *Tool) bool {
-			return slices.ContainsFunc(_ExcludeList, func(s string) bool {
-				return tool.Name == s
-			})
-		})
+		targetTools = tools
 	} else {
 		for _, target := range targets {
-			var found bool
 			for _, tool := range tools {
 				if tool.Name == target {
 					targetTools = append(targetTools, tool)
-					found = true
 					break
 				}
 			}
-			if !found {
-				fmt.Printf("Error: tool %s not found\n", target)
-			}
 		}
 	}
-	return targetTools
+	return toolFilter(targetTools, legacy)
 }
 
 // ReadSubCommands returns current menu items
@@ -267,23 +293,4 @@ func ReadSubCommands() ([]string, bool, error) {
 		return nil, true, nil
 	}
 	return strings.Split(value, ";"), true, err
-}
-
-var (
-	// unstable tools, they will not show in context menu
-	_ExcludeList = []string{
-		"dotMemory Portable",
-		"dotPeek Portable",
-		"dotTrace Portable",
-		"ReSharper Tools",
-	}
-)
-
-func checkExclude(tools []*Tool) error {
-	for _, tool := range tools {
-		if slices.Contains(_ExcludeList, tool.Name) {
-			return fmt.Errorf("unsupported tool: %s", tool.Name)
-		}
-	}
-	return nil
 }

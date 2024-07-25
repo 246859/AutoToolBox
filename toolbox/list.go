@@ -30,7 +30,11 @@ Examples:
 			fmt.Println(len(tools))
 		} else { // show list
 			for _, tool := range tools {
-				fmt.Printf("%-30s\t%-10s\n", tool.Name, tool.Version)
+				var tips string
+				if tool.availability > 0 {
+					tips = tool.availability.String()
+				}
+				fmt.Printf("%-30s\t%-20s\t%-10s\n", tool.Name, tool.Version, tips)
 			}
 		}
 		return nil
