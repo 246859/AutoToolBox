@@ -27,7 +27,7 @@ build:
 	# build go module
 	go build -trimpath \
 		-ldflags="-X main.AppName=$(app) -X main.Version=$(git_version)" \
-		-o $(output)/$(app)-$(os)-$(arch)$(exe) \
+		-o $(output)/$(app)-$(os)-$(arch)/$(app)$(exe) \
 		$(module)
 
 	# resume host environment $(host_os)/$(host_arch)
