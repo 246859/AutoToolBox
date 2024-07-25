@@ -13,6 +13,10 @@ var addCmd = &cobra.Command{
 	Long: `Command "add" will append items to the existing context menu instead of overwrite them. 
 
 Use "tbm set -h" for more information.
+
+Examples:
+  tbm add GoLand --admin
+  tbm add GoLand WebStorm 
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {

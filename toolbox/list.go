@@ -14,6 +14,13 @@ var (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List installed ToolBox IDEs",
+	Long: `Command "list" will list all installed ToolBox IDEs.
+
+Examples:
+  tbm list -c 
+  tbm list --menu
+  tbm list -c --menu
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		tools, err := ListToolboxTools(_ToolBoxDir, showInMenu)
 		if err != nil {

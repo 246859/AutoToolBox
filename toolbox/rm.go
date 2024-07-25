@@ -11,7 +11,13 @@ var removeCmd = &cobra.Command{
 	Use:     "remove",
 	Aliases: []string{"rm"},
 	Short:   "Remove ToolBox IDEs from context menu",
-	Long:    `Command "remove" will remove the specified IDEs from the context menu, use "tbm remove -a" to remove all IDEs.`,
+	Long: `Command "remove" will remove the specified IDEs from the context menu, use "tbm remove -a" to remove all IDEs.
+
+Example:
+  tbm rm GoLand
+  tbm rm GoLand WebStorm
+  tbm rm -a
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !all && len(args) == 0 {
 			fmt.Println(`no tools specified, use "tbm list" to show all installed tools, use "tbm rm -h" to get help.`)
