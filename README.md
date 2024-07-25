@@ -51,6 +51,8 @@ $HOME/AppData/Local/Jetbrains/Toolbox/
 
 ### 开始
 
+> **工具需要管理员权限才能正常运行**
+
 安装好后执行如下命令
 
 ```bash

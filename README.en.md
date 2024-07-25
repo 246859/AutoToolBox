@@ -48,6 +48,8 @@ Please make sure that **Generate Shell Script** in the settings is turned on, ot
 
 ### Start
 
+>  **The tool requires administrator privileges to run properly**
+
 After installation, execute the following command
 
 ```bash
