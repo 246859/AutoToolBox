@@ -67,12 +67,11 @@ func AddToolboxMenu(dir string, targets []string, admin, top bool) ([]*Tool, err
 
 	// create new subcommands
 	for _, tool := range appendTools {
-		cmd := filepath.Join(tool.Location, tool.Command)
-		ico := cmd
+		ico := filepath.Join(tool.Location, tool.Command)
 		if tool.Id == "MPS" {
 			ico = filepath.Join(tool.Location, "bin/mps.ico")
 		}
-		err := setItem(tool.Id, tool.Name, ico, cmd, admin)
+		err := setItem(tool.Id, tool.Name, ico, tool.Script, admin)
 		if err != nil {
 			return nil, err
 		}

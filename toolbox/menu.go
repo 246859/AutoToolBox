@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/tidwall/gjson"
 	"golang.org/x/sys/windows/registry"
 	"os"
 	"path/filepath"
@@ -15,8 +16,11 @@ import (
 const (
 	_AppName        = "Toolbox"
 	_StateFile      = "state.json"
+	_SettingFile    = ".settings.json"
 	_ToolBoxPath    = "/AppData/Local/JetBrains/Toolbox"
 	_ToolBoxCommand = "/bin/jetbrains-toolbox.exe"
+	_ScriptExt      = "cmd"
+
 	// registry keys
 	_DirectoryBackgroundShell = `Directory\Background\shell\`
 	_DirectoryShell           = `Directory\shell\`
@@ -75,6 +79,8 @@ see more information at https://github.com/246859/AutoToolBox
 type ToolBox struct {
 	Version string  `json:"AppVersion"`
 	Tools   []*Tool `json:"tools"`
+
+	ShellPath string
 }
 
 // Tool represents an IDE in ToolBox.
@@ -84,15 +90,21 @@ type Tool struct {
 	Name        string `json:"displayName"`
 	Version     string `json:"displayVersion"`
 	BuildNumber string `json:"buildNumber"`
+	Channel     string `json:"channelId"`
 	Location    string `json:"installLocation"`
-	Command     string `json:"launchCommand"`
+	// exe
+	Command string `json:"launchCommand"`
+	// script file
+	Script string
 
-	order           int
-	multipleVersion bool
+	order       int
+	unSupported bool
 }
 
 // GetToolBoxState returns content of ToolBox/state.json
 func GetToolBoxState(dir string) (*ToolBox, error) {
+
+	// get toolbox tools information from state.json
 	stateFilepath := filepath.Join(dir, _StateFile)
 	stateFile, err := os.Open(stateFilepath)
 	if err != nil {
@@ -102,9 +114,48 @@ func GetToolBoxState(dir string) (*ToolBox, error) {
 	if err := json.NewDecoder(stateFile).Decode(&toolbox); err != nil {
 		return nil, err
 	}
+
+	// read shell path
+	settingBytes, err := os.ReadFile(filepath.Join(dir, _SettingFile))
+	if err != nil {
+		return nil, err
+	}
+	toolbox.ShellPath = gjson.GetBytes(settingBytes, "shell_scripts.location").String()
+	if toolbox.ShellPath == "" {
+		defaultDir, err := getDefaultTbDIr()
+		if err != nil {
+			return nil, err
+		}
+		toolbox.ShellPath = filepath.Join(defaultDir, "script")
+	}
+
+	// get shell script name for per tool from channel file
 	for i, tool := range toolbox.Tools {
+		channelBytes, err := os.ReadFile(filepath.Join(dir, "channels", fmt.Sprintf("%s.json", tool.Channel)))
+		if err != nil {
+			return nil, err
+		}
+
+		// find shel script from extension
+		extensions := gjson.GetBytes(channelBytes, "tool.extensions")
+		if extensions.Exists() {
+			for _, ext := range extensions.Array() {
+				if ext.Get("type").String() == "shell" {
+					scriptName := ext.Get("name").String()
+					tool.Script = filepath.Join(toolbox.ShellPath, fmt.Sprintf("%s.%s", scriptName, _ScriptExt))
+				}
+			}
+		}
+
+		if tool.Script == "" {
+			tool.unSupported = true
+		}
+
+		// by default, the ordering of tools is depending on state.json that is maintained by Toolbox.
+		// Toolbox app will update state.json after you change the order of tools.
 		tool.order = i
 	}
+
 	return &toolbox, err
 }
 
@@ -127,15 +178,6 @@ func GetAllTools(dir string) (*ToolBox, error) {
 	for _, tool := range toolbox.Tools {
 		tools[tool.Name] = append(tools[tool.Name], tool)
 	}
-
-	for _, list := range tools {
-		if len(list) > 1 {
-			for _, tool := range list {
-				tool.multipleVersion = true
-			}
-		}
-	}
-
 	return toolbox, nil
 }
 

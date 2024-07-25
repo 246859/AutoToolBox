@@ -113,12 +113,11 @@ func SetToolBoxMenu(dir string, targets []string, top, admin, all, update bool) 
 	var items []string
 	// add menu item
 	for _, tool := range tools {
-		cmd := filepath.Join(tool.Location, tool.Command)
-		ico := cmd
+		ico := filepath.Join(tool.Location, tool.Command)
 		if tool.Id == "MPS" {
 			ico = filepath.Join(tool.Location, "bin/mps.ico")
 		}
-		err := setItem(tool.Id, tool.Name, ico, cmd, admin)
+		err := setItem(tool.Id, tool.Name, ico, tool.Script, admin)
 		if err != nil {
 			return nil, err
 		}
