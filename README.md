@@ -66,12 +66,12 @@ $ tbm set -a
 ### 命令
 
 ```
-Available Commands:
-  add         Add ToolBox IDE to existing context menu
-  list        List installed ToolBox IDEs
-  remove      Remove ToolBox IDEs from context menu
-  set         Register ToolBox IDEs to context menu
-  version     Print ToolBox version
+add         Add ToolBox IDE to existing context menu
+clear       clear all the context menu of Toolbox
+list        List installed ToolBox IDEs
+remove      Remove ToolBox IDEs from context menu
+set         Register ToolBox IDEs to context menu
+version     Print ToolBox version
 ```
 
 下面简单讲一下每个命令的大概作用
