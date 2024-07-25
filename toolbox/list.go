@@ -3,23 +3,27 @@ package toolbox
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"slices"
 )
 
-var listcount bool
+var (
+	showCount  bool
+	showInMenu bool
+)
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List installed ToolBox IDEs",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		tools, err := ListLocalTools(_ToolBoxDir)
+		tools, err := ListToolboxTools(_ToolBoxDir, showInMenu)
 		if err != nil {
 			return err
 		}
-		if listcount {
+		if showCount {
 			fmt.Println(len(tools))
-		} else {
+		} else { // show list
 			for _, tool := range tools {
-				fmt.Println(tool)
+				fmt.Printf("%-30s\t%-10s\n", tool.Name, tool.Version)
 			}
 		}
 		return nil
@@ -27,18 +31,38 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	listCmd.Flags().BoolVarP(&listcount, "count", "c", false, "count the number of installed tools")
+	listCmd.Flags().BoolVarP(&showCount, "count", "c", false, "count the number of installed tools")
+	listCmd.Flags().BoolVar(&showInMenu, "menu", false, "list the tools shown in the context menu")
 }
 
-// ListLocalTools return local tool list description
-func ListLocalTools(dir string) ([]string, error) {
-	toolbox, err := GetToolBoxState(dir)
+// ListToolboxTools list local tools
+func ListToolboxTools(dir string, showInMenu bool) ([]*Tool, error) {
+	if !showInMenu {
+		toolBox, err := GetAllTools(dir)
+		if err != nil {
+			return nil, err
+		}
+		return toolBox.Tools, err
+	}
+
+	toolbox, err := GetLatestTools(dir, _SortNames)
 	if err != nil {
 		return nil, err
 	}
-	var list []string
-	for _, tool := range toolbox.Tools {
-		list = append(list, fmt.Sprintf("%-30s\t%-20s", tool.Name, tool.Version))
+
+	items, exist, err := ReadSubCommands()
+	if err != nil {
+		return nil, err
+	} else if !exist {
+		return nil, nil
 	}
-	return list, nil
+
+	var tools []*Tool
+	for _, tool := range toolbox.Tools {
+		if slices.ContainsFunc(items, func(id string) bool { return tool.Id == id }) {
+			tools = append(tools, tool)
+		}
+	}
+	sortTools(tools, _SortNames)
+	return tools, nil
 }
