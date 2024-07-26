@@ -2,7 +2,7 @@
 
 [English](README.en.md)|**简体中文**
 
->  如果你是旧版使用者，请前往[v2.2.0 · 246859/AutoToolBox (github.com)](https://github.com/246859/AutoToolBox/tree/v2.2.0)查看信息，或者更新到新版
+>  如果你是旧版使用者，请前往[v2.2.0 · 246859/AutoToolBox (github.com)](https://github.com/246859/AutoToolBox/tree/v2.2.0)查看信息，或者查看[迁移到新版](#迁移)
 
 更新：时隔六年JetBrains终于开始尝试解决上下文菜单的问题，但菜单项是隐藏在打开方式里面的，仅对文件起作用，对于目录和目录背景并不生效，这明明只是一个很简单的功能，却迟迟不支持，所以本项目依旧有存在的必要性。
 
@@ -48,6 +48,9 @@ $HOME/AppData/Local/Jetbrains/Toolbox/
 请确保设置中的**生成Shell脚本**处于打开状态，否则工具无法正常工具。
 
 <img alt="shellpath" src="image/shellpath.png" width=500 height=200/>
+
+### 迁移
+如果你是旧版工具的使用者，且想要升级到新版，可以使用旧版生成的`toolboxRemove.reg`将旧版注册表删除，然后再按照下面的方法使用新版即可。
 
 ### 开始
 

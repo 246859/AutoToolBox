@@ -2,7 +2,7 @@
 
 **English**|[简体中文](README.md)
 
-> If you are using the old version, please go to [v2.2.0 · 246859/AutoToolBox (github.com)](https://github.com/246859/AutoToolBox/tree/v2.2.0) to view information, or update to the new version
+> If you are using the old version, please go to [v2.2.0 · 246859/AutoToolBox (github.com)](https://github.com/246859/AutoToolBox/tree/v2.2.0) to view information, or [update to the new version](#Upgrade)
 
 Update: After six years, JetBrains finally started to try to solve the problem of context menu, but the menu item is hidden in the open method, which only works for files, not for directories and directory backgrounds. This is obviously just a very simple function, but it has not been supported for a long time, so this project still needs to exist.
 
@@ -45,6 +45,10 @@ The tool uses the above path by default and does not require additional paramete
 Please make sure that **Generate Shell Script** in the settings is turned on, otherwise the tool will not work properly.
 
 <img alt="shellpath" src="image/shellpath.png" width=500 height=200/>
+
+
+### Upgrade
+If you are an old tool user and want to upgrade to a new version, you can use the old generated 'toolboxRemove.reg' to remove the old registry, and then use the new version as follows.
 
 ### Start
 
