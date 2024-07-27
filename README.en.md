@@ -13,10 +13,10 @@ Original issue link: [TBX-2540 (jetbrains.com)](https://youtrack.jetbrains.com/i
 This is a very simple command line tool for adding a windows right-click menu to the Toolbox App. It has the following features:
 
 - Updating or rolling back the version will not cause the menu to become invalid (when there are multiple versions of the IDE at the same time, only the latest version will be directed)
-
 - You can set the IDE to be opened with administrator privileges
 - No need to manually maintain the registry,
 - The display order of the menu is synchronized with that in the Toolbox
+- Easy to delete
 
 Here is the effect diagram
 
