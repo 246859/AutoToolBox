@@ -1,7 +1,8 @@
-package toolbox
+package main
 
 import (
 	"fmt"
+	"github.com/246859/AutoToolBox/v3/toolbox"
 	"github.com/spf13/cobra"
 	"slices"
 )
@@ -22,7 +23,7 @@ Examples:
 			fmt.Println(`no tools specified, use "tbm list" to show all installed tools, use "tbm add -h" to get help.`)
 			return nil
 		}
-		tools, err := AddToolboxMenu(_ToolBoxDir, args, top, admin)
+		tools, err := RunAdd(ToolBoxDir, args, top, admin)
 		if err != nil {
 			return err
 		}
@@ -41,22 +42,22 @@ func init() {
 	addCmd.Flags().BoolVarP(&silence, "silence", "s", false, "silence output")
 }
 
-func AddToolboxMenu(dir string, targets []string, admin, top bool) ([]*Tool, error) {
+func RunAdd(dir string, targets []string, admin, top bool) ([]*toolbox.Tool, error) {
 	// get all latest tools
-	toolbox, err := GetLatestTools(dir, _SortOrder)
+	toolboxState, err := toolbox.GetLatestTools(dir, toolbox.SortOrder)
 	if err != nil {
 		return nil, err
 	}
 	// collect tools
-	appendTools := FindTargetTools(toolbox.Tools, targets, false)
+	appendTools := toolbox.FindTargetTools(toolboxState.Tools, targets, false)
 
-	if len(appendTools) > _EntryLimit {
+	if len(appendTools) > toolbox.EntryLimit {
 		fmt.Println("Warning: too many tools, only first 16 will be added to the context menu")
-		appendTools = appendTools[:_EntryLimit]
+		appendTools = appendTools[:toolbox.EntryLimit]
 	}
 
 	// read subCommands
-	items, _, err := ReadSubCommands()
+	items, _, err := toolbox.ReadSubCommands()
 	if err != nil {
 		return nil, err
 	}
@@ -70,14 +71,14 @@ func AddToolboxMenu(dir string, targets []string, admin, top bool) ([]*Tool, err
 
 	// create new subcommands
 	for _, tool := range appendTools {
-		err := setItem(tool, all)
+		err := toolbox.SetItem(tool, all)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// update menu
-	if err := setMenu(items, top); err != nil {
+	if err := toolbox.SetMenu(dir, items, top); err != nil {
 		return nil, err
 	}
 	return appendTools, nil

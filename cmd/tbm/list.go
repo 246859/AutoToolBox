@@ -1,7 +1,8 @@
-package toolbox
+package main
 
 import (
 	"fmt"
+	"github.com/246859/AutoToolBox/v3/toolbox"
 	"github.com/spf13/cobra"
 	"slices"
 )
@@ -22,7 +23,7 @@ Examples:
   tbm list -c --menu
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		tools, err := ListToolboxTools(_ToolBoxDir, showInMenu)
+		tools, err := ListToolboxTools(ToolBoxDir, showInMenu)
 		if err != nil {
 			return err
 		}
@@ -31,8 +32,8 @@ Examples:
 		} else { // show list
 			for _, tool := range tools {
 				var tips string
-				if tool.availability > 0 {
-					tips = tool.availability.String()
+				if tool.Availability > 0 {
+					tips = tool.Availability.String()
 				}
 				fmt.Printf("%-30s\t%-20s\t%-10s\n", tool.Name, tool.Version, tips)
 			}
@@ -47,33 +48,33 @@ func init() {
 }
 
 // ListToolboxTools list local tools
-func ListToolboxTools(dir string, showInMenu bool) ([]*Tool, error) {
+func ListToolboxTools(dir string, showInMenu bool) ([]*toolbox.Tool, error) {
 	if !showInMenu {
-		toolBox, err := GetAllTools(dir)
+		toolBox, err := toolbox.GetAllTools(dir)
 		if err != nil {
 			return nil, err
 		}
 		return toolBox.Tools, err
 	}
 
-	toolbox, err := GetLatestTools(dir, _SortNames)
+	toolboxState, err := toolbox.GetLatestTools(dir, toolbox.SortNames)
 	if err != nil {
 		return nil, err
 	}
 
-	items, exist, err := ReadSubCommands()
+	items, exist, err := toolbox.ReadSubCommands()
 	if err != nil {
 		return nil, err
 	} else if !exist {
 		return nil, nil
 	}
 
-	var tools []*Tool
-	for _, tool := range toolbox.Tools {
+	var tools []*toolbox.Tool
+	for _, tool := range toolboxState.Tools {
 		if slices.ContainsFunc(items, func(id string) bool { return tool.Id == id }) {
 			tools = append(tools, tool)
 		}
 	}
-	sortTools(tools, _SortNames)
+	toolbox.SortTools(tools, toolbox.SortNames)
 	return tools, nil
 }

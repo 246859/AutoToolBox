@@ -55,8 +55,8 @@ func compareName(a string, b string) int {
 	return strings.Compare(nameA, nameB)
 }
 
-// open a registry key, create it if it doesn't exist.
-func createAndOpen(key registry.Key, path string, access uint32) (registry.Key, error) {
+// OpenOrCreateKey open a registry key, create it if it doesn't exist.
+func OpenOrCreateKey(key registry.Key, path string, access uint32) (registry.Key, error) {
 	newk, existing, err := registry.CreateKey(key, path, access)
 	if err != nil {
 		return 0, err
@@ -67,8 +67,8 @@ func createAndOpen(key registry.Key, path string, access uint32) (registry.Key, 
 	return newk, nil
 }
 
-// delete a registry key and its sub keys.
-func deleteKey(key registry.Key, path string) error {
+// DeleteKey delete a registry key and its sub keys.
+func DeleteKey(key registry.Key, path string) error {
 	parentKey, err := registry.OpenKey(key, path, registry.READ)
 	if errors.Is(err, registry.ErrNotExist) {
 		return nil
@@ -89,7 +89,7 @@ func deleteKey(key registry.Key, path string) error {
 
 	for _, name := range subKeyNames {
 		subKeyPath := path + name
-		err := deleteKey(key, subKeyPath)
+		err := DeleteKey(key, subKeyPath)
 		if err != nil {
 			return err
 		}
@@ -108,17 +108,17 @@ func commandScript(cmd string, admin bool) string {
 }
 
 const (
-	_SortNames = 0
-	_SortOrder = 1
+	SortNames = 0
+	SortOrder = 1
 )
 
-func sortTools(tools []*Tool, sortType int) {
+func SortTools(tools []*Tool, sortType int) {
 	switch sortType {
-	case _SortNames:
+	case SortNames:
 		slices.SortFunc(tools, func(a, b *Tool) int {
 			return compareName(a.Name, b.Name)
 		})
-	case _SortOrder:
+	case SortOrder:
 		slices.SortFunc(tools, func(a, b *Tool) int {
 			return cmp.Compare(a.order, b.order)
 		})

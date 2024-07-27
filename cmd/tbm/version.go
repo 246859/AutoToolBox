@@ -1,7 +1,8 @@
-package toolbox
+package main
 
 import (
 	"fmt"
+	"github.com/246859/AutoToolBox/v3/toolbox"
 	"github.com/spf13/cobra"
 )
 
@@ -9,7 +10,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print ToolBox version",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		version, err := GetToolBoxVersion(_ToolBoxDir)
+		version, err := GetToolBoxVersion(ToolBoxDir)
 		if err != nil {
 			return err
 		}
@@ -19,9 +20,9 @@ var versionCmd = &cobra.Command{
 }
 
 func GetToolBoxVersion(dir string) (string, error) {
-	toolbox, err := GetToolBoxState(dir)
+	toolBoxState, err := toolbox.GetToolBoxState(dir)
 	if err != nil {
 		return "", err
 	}
-	return toolbox.Version, nil
+	return toolBoxState.Version, nil
 }

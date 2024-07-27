@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/tidwall/gjson"
 	"golang.org/x/sys/windows/registry"
 	"os"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	_AppName        = "Toolbox"
+	AppName         = "Toolbox"
 	_StateFile      = "state.json"
 	_SettingFile    = ".settings.json"
 	_ToolBoxPath    = "/AppData/Local/JetBrains/Toolbox"
@@ -22,58 +21,27 @@ const (
 	_ScriptExt      = "cmd"
 
 	// registry keys
-	_DirectoryBackgroundShell = `Directory\Background\shell\`
-	_DirectoryShell           = `Directory\shell\`
-	_CommandStoreShell        = `SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\`
+	DirectoryBackgroundShell = `Directory\Background\shell\`
+	DirectoryShell           = `Directory\shell\`
+	CommandStoreShell        = `SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\`
 
-	// max limit for cascade menu
-	_EntryLimit = 16
+	// EntryLimit max limit for cascade menu
+	EntryLimit = 16
 )
 
-// returns default toolbox installation directory.
-func getDefaultTbDIr() (string, error) {
+const (
+	// using the VBScript to open IDE as admin
+	_VBScript  = `mshta vbscript:createobject("shell.application").shellexecute("%s","%%V","","runas",1)(close)`
+	_CmdScript = `"%s" "%%V"`
+)
+
+// DefaultToolboxDir returns default toolbox installation directory.
+func DefaultToolboxDir() (string, error) {
 	dir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
 	return filepath.Join(dir, _ToolBoxPath), nil
-}
-
-var _ToolBoxDir string
-
-func NewToolBoxMenuCommand(version string) (*cobra.Command, error) {
-	tbmCmd := &cobra.Command{
-		Use:          "tbm",
-		Version:      version,
-		SilenceUsage: true,
-		Short:        `ToolBox Menu helper`,
-		Long: `tbm is a helper tool to manage ToolBox IDEs context menu on Windows.
-
-Toolbox App is located at $HOME/AppData/Local/JetBrains/ by default, in most cases 
-you do not need to specify the path unless you have moved this location. If you did 
-do that, use -d to specify the directory.
-
-see more information at https://github.com/246859/AutoToolBox 
-`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
-	}
-	// get default installation dir
-	defaultTbDIr, err := getDefaultTbDIr()
-	if err != nil {
-		return nil, err
-	}
-	tbmCmd.SetVersionTemplate("{{ .Version }}")
-	tbmCmd.PersistentFlags().StringVar(&_ToolBoxDir, "dir", defaultTbDIr, "specify the directory where ToolBox installed")
-	tbmCmd.AddCommand(versionCmd)
-	tbmCmd.AddCommand(listCmd)
-	tbmCmd.AddCommand(setCmd)
-	tbmCmd.AddCommand(addCmd)
-	tbmCmd.AddCommand(removeCmd)
-	tbmCmd.AddCommand(clearCmd)
-
-	return tbmCmd, nil
 }
 
 // ToolBox is a struct to hold the toolbox state.
@@ -108,7 +76,7 @@ func (a Availability) String() string {
 func toolFilter(tools []*Tool, maxAvl Availability) []*Tool {
 	var filtered []*Tool
 	for _, tool := range tools {
-		if tool.availability <= maxAvl {
+		if tool.Availability <= maxAvl {
 			filtered = append(filtered, tool)
 		}
 	}
@@ -127,10 +95,10 @@ type Tool struct {
 	// exe
 	Command string `json:"launchCommand"`
 	// script file
-	Script string
+	Script       string
+	Availability Availability
 
-	order        int
-	availability Availability
+	order int
 }
 
 // GetToolBoxState returns content of ToolBox/state.json
@@ -154,7 +122,7 @@ func GetToolBoxState(dir string) (*ToolBox, error) {
 	}
 	toolbox.ShellPath = gjson.GetBytes(settingBytes, "shell_scripts.location").String()
 	if toolbox.ShellPath == "" {
-		defaultDir, err := getDefaultTbDIr()
+		defaultDir, err := DefaultToolboxDir()
 		if err != nil {
 			return nil, err
 		}
@@ -181,9 +149,9 @@ func GetToolBoxState(dir string) (*ToolBox, error) {
 
 		// judge availability
 		if tool.Script == "" && tool.Command == "" {
-			tool.availability = unavailable
+			tool.Availability = unavailable
 		} else if tool.Script == "" {
-			tool.availability = legacy
+			tool.Availability = legacy
 		}
 
 		// by default, the ordering of tools is depending on state.json that is maintained by Toolbox.
@@ -242,7 +210,7 @@ func GetLatestTools(dir string, sortType int) (*ToolBox, error) {
 			latestTools = append(latestTools, FindLatestTool(list))
 		}
 	}
-	sortTools(latestTools, sortType)
+	SortTools(latestTools, sortType)
 	toolbox.Tools = latestTools
 	return toolbox, nil
 }
@@ -278,7 +246,7 @@ func FindTargetTools(tools []*Tool, targets []string, all bool) []*Tool {
 
 // ReadSubCommands returns current menu items
 func ReadSubCommands() ([]string, bool, error) {
-	bgShellKey, err := registry.OpenKey(registry.CLASSES_ROOT, _DirectoryBackgroundShell+_AppName, registry.READ)
+	bgShellKey, err := registry.OpenKey(registry.CLASSES_ROOT, DirectoryBackgroundShell+AppName, registry.READ)
 	if errors.Is(err, registry.ErrNotExist) {
 		return nil, false, nil
 	} else if err != nil {
@@ -294,4 +262,101 @@ func ReadSubCommands() ([]string, bool, error) {
 		return nil, true, nil
 	}
 	return strings.Split(value, ";"), true, err
+}
+
+func SetMenu(dir string, items []string, top bool) error {
+	toolboxDisplay := fmt.Sprintf("Open %s Here", AppName)
+	toolboxCmd := filepath.Join(dir, _ToolBoxCommand)
+	subCommands := strings.Join(items, ";")
+
+	// add directory background shell
+	err := SetMenuItem(DirectoryBackgroundShell+AppName, toolboxDisplay, toolboxCmd, subCommands, top)
+	if err != nil {
+		return err
+	}
+
+	// add directory shell
+	err = SetMenuItem(DirectoryShell+AppName, toolboxDisplay, toolboxCmd, subCommands, top)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SetMenuItem add menu to registry
+func SetMenuItem(path, display, command, subCommands string, top bool) error {
+	key, err := OpenOrCreateKey(registry.CLASSES_ROOT, path, registry.WRITE)
+	if err != nil {
+		return err
+	}
+	defer key.Close()
+
+	// set display content
+	if err := key.SetStringValue("MUIVerb", display); err != nil {
+		return err
+	}
+
+	// set icon
+	if err := key.SetStringValue("Icon", command); err != nil {
+		return err
+	}
+
+	// set sub commands
+	if err := key.SetStringValue("SubCommands", subCommands); err != nil {
+		return err
+	}
+
+	// position
+	if top {
+		err := key.SetStringValue("Position", "Top")
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// SetItem setItem add items to commandStore shell
+func SetItem(tool *Tool, admin bool) error {
+
+	regPath := CommandStoreShell + tool.Id
+	ico := filepath.Join(tool.Location, tool.Command)
+	script := tool.Script
+	// special case for MPS
+	if tool.Id == "MPS" {
+		ico = filepath.Join(tool.Location, "bin/mps.ico")
+	}
+	if tool.Availability == legacy {
+		script = ico
+	} else if tool.Availability == unavailable {
+		return nil
+	}
+	// create or open registry key
+	key, err := OpenOrCreateKey(registry.LOCAL_MACHINE, regPath, registry.WRITE)
+	if err != nil {
+		return err
+	}
+
+	// default value
+	if err := key.SetStringValue("", fmt.Sprintf("Open %s Here", tool.Name)); err != nil {
+		return err
+	}
+	// set icon
+	if err := key.SetStringValue("Icon", ico); err != nil {
+		return err
+	}
+
+	// command sub key
+	cmdKey, err := OpenOrCreateKey(registry.LOCAL_MACHINE, regPath+`\command`, registry.WRITE)
+	if err != nil {
+		return err
+	}
+
+	// set command
+	if err := cmdKey.SetStringValue("", commandScript(script, admin)); err != nil {
+		return err
+	}
+
+	return nil
 }

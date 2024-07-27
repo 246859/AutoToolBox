@@ -1,7 +1,8 @@
-package toolbox
+package main
 
 import (
 	"fmt"
+	"github.com/246859/AutoToolBox/v3/toolbox"
 	"github.com/spf13/cobra"
 	"golang.org/x/sys/windows/registry"
 	"slices"
@@ -23,7 +24,7 @@ Example:
 			fmt.Println(`no tools specified, use "tbm list" to show all installed tools, use "tbm rm -h" to get help.`)
 			return nil
 		}
-		tools, err := RemoveTools(_ToolBoxDir, args, all)
+		tools, err := RemoveTools(ToolBoxDir, args, all)
 		if err != nil {
 			return err
 		}
@@ -41,17 +42,17 @@ func init() {
 	removeCmd.Flags().BoolVarP(&all, "all", "a", false, "remove all")
 }
 
-func RemoveTools(dir string, targets []string, all bool) ([]*Tool, error) {
-	toolbox, err := GetLatestTools(dir, _SortOrder)
+func RemoveTools(dir string, targets []string, all bool) ([]*toolbox.Tool, error) {
+	toolboxState, err := toolbox.GetLatestTools(dir, toolbox.SortOrder)
 	if err != nil {
 		return nil, err
 	}
 
 	// get local tools
-	preparedTools := FindTargetTools(toolbox.Tools, targets, all)
+	preparedTools := toolbox.FindTargetTools(toolboxState.Tools, targets, all)
 
 	// read subcommands
-	items, exist, err := ReadSubCommands()
+	items, exist, err := toolbox.ReadSubCommands()
 	if err != nil {
 		return nil, err
 	} else if !exist {
@@ -59,7 +60,7 @@ func RemoveTools(dir string, targets []string, all bool) ([]*Tool, error) {
 	}
 
 	// find union set between preparedTools and items
-	var temp []*Tool
+	var temp []*toolbox.Tool
 	for _, tool := range preparedTools {
 		if slices.Contains(items, tool.Id) {
 			temp = append(temp, tool)
@@ -74,26 +75,26 @@ func RemoveTools(dir string, targets []string, all bool) ([]*Tool, error) {
 	}
 
 	// update menu subCommands
-	if err := setMenu(items, false); err != nil {
+	if err := toolbox.SetMenu(dir, items, false); err != nil {
 		return nil, err
 	}
 
 	// remove menu item
-	var removedTools []*Tool
+	var removedTools []*toolbox.Tool
 	for _, tool := range preparedTools {
-		err := deleteKey(registry.LOCAL_MACHINE, _CommandStoreShell+tool.Id)
+		err := toolbox.DeleteKey(registry.LOCAL_MACHINE, toolbox.CommandStoreShell+tool.Id)
 		if err != nil {
-			return nil, fmt.Errorf("Error deleting registry key %s:  %v\n", _CommandStoreShell+tool.Id, err)
+			return nil, fmt.Errorf("Error deleting registry key %s:  %v\n", toolbox.CommandStoreShell+tool.Id, err)
 		}
 		removedTools = append(removedTools, tool)
 	}
 
 	// remove top level menu if remove all
 	if all {
-		if err := deleteKey(registry.CLASSES_ROOT, _DirectoryBackgroundShell+_AppName); err != nil {
+		if err := toolbox.DeleteKey(registry.CLASSES_ROOT, toolbox.DirectoryBackgroundShell+toolbox.AppName); err != nil {
 			return nil, err
 		}
-		if err := deleteKey(registry.CLASSES_ROOT, _DirectoryShell+_AppName); err != nil {
+		if err := toolbox.DeleteKey(registry.CLASSES_ROOT, toolbox.DirectoryShell+toolbox.AppName); err != nil {
 			return nil, err
 		}
 	}
