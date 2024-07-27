@@ -33,3 +33,13 @@ build:
 	# resume host environment $(host_os)/$(host_arch)
 	go env -w GOOS=$(host_os)
 	go env -w GOARCH=$(host_arch)
+
+# support platforms
+windows := 386 amd64 arm64 arm
+platforms := windows
+
+.PHONY: build_all
+build_all:
+	@$(foreach os_i, $(platforms), \
+		$(foreach arch_j, $(call $(os_i)), \
+			$(shell $(MAKE) build os=$(os_i) arch=$(arch_j) mode=$(mode))))
