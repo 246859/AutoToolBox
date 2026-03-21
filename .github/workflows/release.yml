@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}/${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [windows]
+        arch: [386, amd64, arm, arm64]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build
+        run: |
+          make build os=${{ matrix.os }} arch=${{ matrix.arch }}
+          
+      - name: Archive
+        run: |
+          cd build/tbm-${{ matrix.os }}-${{ matrix.arch }}
+          zip -r ../tbm-${{ matrix.os }}-${{ matrix.arch }}.zip ./*
+          
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/tbm-${{ matrix.os }}-${{ matrix.arch }}.zip
