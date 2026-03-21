@@ -17,12 +17,12 @@ endif
 
 .PHONY: build
 build:
-	# go lint
-	go vet ./...
-
 	# prepare target environment $(os)/$(arch)
 	go env -w GOOS=$(os)
 	go env -w GOARCH=$(arch)
+
+	# go lint
+	go vet ./...
 
 	# build go module
 	go build -trimpath \
